@@ -1,18 +1,25 @@
 """
-Realistic synthetic healthcare KPI data generator.
+Synthetic healthcare KPI panel data generator.
 
-Generates statistically plausible data for a 40-hospital network
-based on published CMS benchmarks and HFMA financial data.
-Includes realistic seasonal patterns, facility-level heterogeneity,
-and causal structure between KPIs.
+Built this to have a dataset with a known ground-truth causal graph so I
+could actually benchmark the discovery algorithm. Baselines are from CMS
+quality reporting data and HFMA industry surveys — not perfectly calibrated
+but in the right ballpark for a community hospital network.
 
-True causal graph (ground truth for benchmarking):
+Staffing crisis shock (quarters 4-8) loosely models 2021-2022 travel nurse
+market. EBITDA margins are tight (6%) which is realistic for non-profit
+health systems post-COVID.
+
+Known ground-truth DAG:
   staffing_ratio → nurse_overtime → patient_satisfaction → readmission_rate
   staffing_ratio → agency_cost
   or_utilization → revenue_per_bed → ebitda_margin
   supply_waste → supply_cost → ebitda_margin
   readmission_rate → penalty_cost → ebitda_margin
   case_mix_index → revenue_per_bed
+
+TODO: add payer mix as a variable — it's a major confounder for revenue_per_bed
+that I haven't modeled yet. Medicare vs commercial mix varies a lot by region.
 """
 
 from __future__ import annotations
