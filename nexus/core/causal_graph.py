@@ -1,11 +1,15 @@
 """
-DAG-constrained Graph Neural Network for causal KPI discovery.
+DAG-constrained GNN for causal KPI discovery.
 
-Implements NOTEARS-MLP (Zheng et al. 2018) with a GNN encoder,
-adapted for enterprise metric causal structure learning.
+Implements NOTEARS-MLP (Zheng et al. 2018) with a GNN encoder instead of
+a plain MLP — the idea being that letting nodes communicate during the
+structural equation learning should help with the kinds of dense causal
+graphs you see in healthcare ops data.
 
-Key innovation: learns the *causal* graph over KPIs — not just correlations —
-so interventions are actually predictive, not spurious.
+TODO: benchmark against DAG-GNN (Yu et al. 2019) — their variational
+approach might handle the non-Gaussian KPI distributions better.
+TODO: the augmented Lagrangian outer loop is slow. Look into the
+DAGMA (Bello et al. 2022) log-det barrier as a drop-in replacement.
 """
 
 from __future__ import annotations
@@ -178,10 +182,7 @@ class CausalKPIGraph(nn.Module):
         return (W > threshold).astype(np.float32)
 
     def get_causal_order(self) -> list[int]:
-        """
-        Topological sort of the learned DAG.
-        Order = causal precedence: nodes earlier in list cause nodes later.
-        """
+        """Topological sort of the learned DAG. Kahn's algorithm."""
         W_bin = self.get_causal_graph()
         n = W_bin.shape[0]
         in_degree = W_bin.sum(axis=0).astype(int)

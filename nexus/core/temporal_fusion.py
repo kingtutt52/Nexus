@@ -1,12 +1,17 @@
 """
 Temporal Fusion Transformer for multi-horizon KPI forecasting.
 
-Based on Lim et al. (2021) "Temporal Fusion Transformers for Interpretable
-Multi-horizon Time Series Forecasting" — adapted for enterprise KPI data
-with explicit support for static covariates (hospital/site metadata) and
-known future inputs (calendar features, scheduled events).
+Re-implementation of Lim et al. (2021) adapted for enterprise KPI data.
+Static covariates = hospital metadata (beds, region, teaching status).
+Known future inputs = calendar features, scheduled OR blocks, fiscal quarters.
 
-Key output: P10/P50/P90 quantile forecasts + variable importance scores.
+Note: the interpretable multi-head attention here shares value projections
+across heads — this is the key difference from vanilla MHA and what makes
+the attention patterns actually meaningful for variable importance analysis.
+
+TODO: add proper training loop with quantile loss + learning rate warmup.
+Currently the architecture is complete but training is on you to wire up
+for your specific data schema.
 """
 
 from __future__ import annotations
